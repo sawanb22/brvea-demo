@@ -1,0 +1,450 @@
+.accordian,
+.reward {
+  background: var(--light);
+  border-radius: 20px;
+  /* font-family: var(--font-pop); */
+  padding: 1.5rem;
+  position: relative;
+  z-index: 22;
+
+  color: var(--dark);
+  border: 2px solid #4100001a;
+  box-shadow: 0px 4px 250px 0px #ffffff40;
+}
+.reward {
+  width: 50%;
+  padding: 14px;
+  padding-left: 1.5rem;
+}
+
+.reward h3 {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 17.5px;
+  opacity: 0.6;
+}
+.reward p {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+}
+.reward img {
+  /* padding: 5px; */
+  /* padding-left: 7px; */
+  background-color: var(--light-yellow);
+  border-radius: 50px;
+  width: 45px;
+  height: 45px;
+}
+
+.accordian .row1[aria-expanded="true"] > div > button {
+  transform: rotate(180deg);
+}
+
+.accordian .row1 .zapbtn {
+  background: var(--dark);
+  border-radius: 10px;
+  color: var(--light);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* .accordian .row1 .imgdiv div {
+  border-radius: 100px;
+  padding: 10px;
+  width: 52px;
+  height: 52px;
+}
+
+ .accordian .row1 .imgdiv > div:first-child {
+  background-color: var(--light-yellow);
+}
+
+ .accordian .row1 .imgdiv > div:last-child {
+  background-color: #000;
+} */
+
+.accordian .row1 h1 {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 20.4px;
+  letter-spacing: -0.02em;
+}
+
+.accordian .row1 > div:first-child>img{
+    width: 63px;
+}
+
+.accordian .row1 > div:last-child span,
+.minidisplay span {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: 0.02em;
+  opacity: 0.5;
+}
+
+.accordian .row1 > div:last-child p,
+.minidisplay p {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 26px;
+  font-family: var(--font-pop) ;
+  letter-spacing: 0.02em;
+  margin-bottom: 0;
+}
+
+.accordian .row1 > div:last-child button {
+  background-color: var(--light);
+  border-radius: 20px;
+  width: 49px;
+  height: 49px;
+  margin: 0 2rem;
+  transition: 0.2s;
+  border: 1px solid #00000033;
+}
+
+/*  .accordian .row1>div:last-child button:focus {
+    transform: rotate(180deg);
+  } */
+
+.accordian .row1 > div:last-child button img {
+  width: 15px;
+}
+
+.accordian .box_container {
+  background: #f4f4f4;
+  /* border: 2px solid #4100001a; */
+  border-radius: 20px;
+  padding: 1rem;
+}
+
+.accordian .box_container > div {
+  width: 32%;
+  position: relative;
+  background-color: var(--light);
+  padding: 1.5rem;
+  /* border: 2px solid #4100001a; */
+  border-radius: 20px;
+}
+
+.accordian .box_container > div > div:nth-child(2) {
+  border-radius: 20px;
+  background-color: var(--light-bg);
+  padding: 0.5rem;
+  border: 1px solid #00000026;
+  /* height: 95px; */
+  margin: 10px 0;
+  padding: 0.5rem 0.5rem 0.8rem 0.9rem;
+}
+
+.accordian .box_container > div > div:nth-child(2) input {
+  border: none;
+  outline: none;
+  background: transparent;
+  /* opacity: .8; */
+  width: 100%;
+  font-weight: 500;
+  font-size: 30px;
+  margin-bottom: 10px;
+  /* height: 100%; */
+}
+
+.accordian
+  .box_container
+  > div
+  > div:nth-child(2)
+  input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.accordian .box_container > div > div:nth-child(2) > div button {
+  border: 1px solid #00000033;
+  border-radius: 0.6rem;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--light);
+  opacity: .85;
+}
+
+.accordian .box_container > div > div:nth-child(2) > div button .max_btn {
+  padding: 0.34rem 0.75rem;
+}
+
+.accordian .box_container > div > div p{
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 11.9px;
+  letter-spacing: 0.02em;
+  margin-bottom: 0;
+}
+.accordian .box_container > div > div > p:first-child {
+  font-family: var(--font-as);
+  line-height: 20px;
+  letter-spacing: 0.11em;
+}
+
+.accordian .box_container > div > div p span {
+  opacity: 0.5;
+  font-weight: 500;
+}
+/* .bg_circle_lgold {
+  padding: 5px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #faeebb;
+  width: 35px;
+  height: 35px;
+} */
+.bg_circle_lgold > img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50px;
+}
+
+/*  .accordian .box_container>div>div>div>div {
+    background-color: var(--light-yellow);
+    padding: 5px;
+    border-radius: 100px;
+  } */
+
+/*  .accordian .box_container>div>div:last-child button {
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 14;
+    margin-top: 1.5rem;
+  } */
+
+/* ===============info style =================== */
+.accordian .info_div {
+  border: 2px solid #4100001a;
+  background: #f5f5f5;
+  border-radius: 12px;
+  /* padding: 1rem; */
+  min-width: 48px;
+}
+
+/* ======== zapModal ================================================================== */
+.zapModal {
+  background: #000000a1;
+  position: fixed;
+  top: 0;
+  font-family: var(--font-pop);
+  height: 100vh;
+  /* padding: 2rem 0; */
+  z-index: 99;
+  width: 100vw;
+  backdrop-filter: blur(20px);
+  left: 0;
+  overflow-y: auto;
+}
+
+.zapModal .imgbg {
+  border-radius: 50px;
+  width: 35px;
+  height: 35px;
+  /* padding: 5px; */
+  /* background-color: #fffbc3; */
+}
+.zapModal button{
+  font-family: var(--font-pop);
+}
+.zapModal .center_card {
+  background-color: var(--light);
+  border-radius: 20px;
+  padding: 2rem;
+  /* font-family: var(--font-pop); */
+  color: var(--dark);
+  font-weight: 600;
+  width: 450px;
+  height: fit-content;
+  margin: 2rem 0;
+}
+.zapModal .center_card h1 {
+  font-size: 25px;
+  font-weight: 300;
+  font-family: var(--font-as);
+}
+.zapModal .center_card .row3,
+.zapModal .center_card .row1 {
+  /* background: var(--light-bg); */
+  border: 2px solid #4100001a;
+  padding: 1rem;
+  border-radius: 15px;
+}
+.zapModal .center_card .row3 > div:first-child,
+.zapModal .center_card .row1 .input_div div {
+  background: #d8d8d880;
+  border: 2px solid #4100001a;
+  padding: 0.5rem;
+  border-radius: 10px;
+}
+.zapModal .center_card .row1 .input_div input {
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  font-size: 25px;
+  /* opacity: 0.6; */
+  width: 100px;
+  font-weight: 600;
+}
+.zapModal .center_card .row1 .input_div input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.zapModal .center_card .row2 div {
+  background-color: var(--dark);
+  border-radius: 50px;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+}
+.zapModal .center_card .row4 span,
+.zapModal .center_card .row3 > div:last-child span,
+.zapModal .center_card .row3 p {
+  opacity: 0.6;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.zapModal .center_card .row3 div img {
+  width: 35px;
+}
+
+.zapModal .center_card .row3 > div:first-child > div > img:last-child {
+  margin-left: -15px;
+}
+
+.zapModal .center_card .row3 > div:last-child p {
+  opacity: 1;
+}
+.zapModal .center_card .row4 div input {
+  width: 50px;
+  outline: none;
+  padding: 3px 5px;
+}
+
+.zapModal .slippage_btn{
+  border: 1px solid #4100001a;
+  background: transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 600;
+}
+
+/* .accord_withdraw_box .coin_circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+.accord_withdraw_box .coin_circle > img {
+  width: 10px;
+  height: 10px;
+  padding-left: 1px;
+} */
+
+
+
+@media (max-width:1100px) {
+  .accordian .box_container>div{
+    width: 49%;
+  }
+}
+@media (max-width:992px) {
+  .reward {
+    width: 70%;
+  }
+}
+
+@media (max-width:767px) {
+
+  .reward {
+    width: 90%;
+    padding: 1rem;
+  }
+
+  .accordian .box_container>div{
+    width: 100%;
+  }
+}
+
+@media (max-width:575px) {
+  .reward {
+    width: 100%;
+  }
+  .accordian .row1 > div:last-child button{
+    margin: 0px;
+  }
+  .accordian .row1 > div:first-child>img{
+    width: 50px;
+    height: 50px;
+  }
+  .accordian .row1 h1{
+    font-size: 20px;
+    margin-bottom: 0;
+  }
+  .accordian{
+    padding: 1rem;
+  }
+
+  .zapModal .center_card {
+    width: 90%;
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (max-width:416px) {
+  .reward{
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .reward button{
+    width: 100%;
+  }
+
+  .accordian .row1 div div p{
+    font-size: 12px;
+  }
+  .accordian{
+    padding: 1rem .5rem;
+  }
+  .accordian .row1 > div:first-child>img{
+    width: 40px;
+    height: 40px;
+  }
+  .accordian .row1 > div:last-child button{
+    width: 40px;
+    height: 40px;
+    border-radius: 15px;
+  }
+  .accordian .row1 h1{
+    font-size: 18px;
+  }
+
+  .accordian .box_container > div{
+    padding: 1rem;
+  }
+
+  .zapModal .center_card {
+    width: 95%;
+  }
+
+  .zapModal .center_card h1 {
+    font-size: 20px;
+  }
+
+  .zapModal .center_card .row3,
+.zapModal .center_card .row1 {
+  padding: .5rem;
+}
+}

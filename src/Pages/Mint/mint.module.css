@@ -1,0 +1,132 @@
+.mint_parent {
+  width: 100%;
+}
+
+.outline_none {
+  outline: none;
+}
+
+.mint {
+  background-color: var(--light);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  color: var(--dark);
+  width: 500px;
+  margin: 3rem 0;
+  box-shadow: 0px 4px 250px 0px #ffffff40;
+}
+
+.mint > div:first-child h1 {
+  font-family: var(--font-as);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 18.3px;
+  letter-spacing: 0.24em;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.mint .inputdiv {
+  border: 1px solid #00000026;
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.mint .inputdiv div input {
+  font-size: 30px;
+  width: 100%;
+  font-weight: 500;
+  line-height: 25.5px;
+  letter-spacing: -0.02em;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.mint .inputdiv div input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.mint .inputdiv div div {
+  border: 1px solid #0000001a;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.mint .inputdiv div div img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50px;
+}
+
+.mint .inputdiv > div:last-child button {
+  border: none;
+  background-color: transparent;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 10.2px;
+  letter-spacing: 0.09em;
+  opacity: 0.8;
+}
+
+.mint .arrow {
+  background: var(--dark);
+  width: 35px;
+  height: 35px;
+  border-radius: 50px;
+  margin: -10px auto;
+}
+
+.mint .slippage div button {
+  border: 1px solid #00000033;
+  border-radius: 50px;
+  background: var(--light);
+  padding: 2px 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mint .bottom {
+  padding: 1rem;
+  border: 1px solid #00000026;
+  border-radius: 20px;
+}
+
+.mint .bottom span,
+.mint .bottom p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 11.9px;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.mint .bottom span,
+.mint .bottom div > p:last-child {
+  font-weight: 500;
+}
+
+@media (max-width: 575px) {
+  .mint {
+    width: 90%;
+  }
+  .mint .inputdiv {
+    padding: 1rem;
+  }
+  .mint .inputdiv div input {
+    font-size: 20px;
+  }
+  .mint .slippage div button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 414px) {
+  .mint {
+    width: 95%;
+    padding: 1.5rem 1rem;
+  }
+  .mint .slippage div button {
+    padding: 2px 7px;
+  }
+}

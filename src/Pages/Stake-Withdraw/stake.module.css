@@ -1,0 +1,133 @@
+.stake {
+  background-color: var(--light);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  color: var(--dark);
+  width: 500px;
+  margin: 3rem 0;
+  box-shadow: 0px 4px 250px 0px #ffffff40;
+}
+
+.stake > div:first-child h1 {
+  font-family: var(--font-as);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 18.3px;
+  letter-spacing: 0.24em;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.stake .top p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 11.9px;
+}
+
+.stake .top div div p {
+  font-size: 25px;
+  font-weight: 500;
+  line-height: 21.25px;
+  letter-spacing: -0.02em;
+}
+
+.stake .top div div img {
+  width: 20px;
+  border-radius: 50px;
+}
+
+.stake .top,
+.stake .inputdiv {
+  border: 1px solid #00000026;
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.stake .inputdiv div input {
+  font-size: 30px;
+  width: 100%;
+  font-weight: 500;
+  line-height: 25.5px;
+  letter-spacing: -0.02em;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.stake .inputdiv div input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.stake .inputdiv div div {
+  border: 1px solid #0000001a;
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+
+.stake .inputdiv div div img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50px;
+}
+
+.stake .inputdiv > div:last-child button {
+  border: none;
+  background-color: transparent;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 10.2px;
+  letter-spacing: 0.09em;
+  opacity: 0.8;
+}
+
+.stake .arrow {
+  background: var(--dark);
+  width: 35px;
+  height: 35px;
+  border-radius: 50px;
+  margin: -10px auto;
+}
+
+.stake .slippage div button {
+  border: 1px solid #00000033;
+  border-radius: 50px;
+  background: var(--light);
+  padding: 3px 10px;
+}
+
+.stake .bottom {
+  padding: 1rem;
+  border: 1px solid #00000026;
+  border-radius: 20px;
+}
+.stake .bottom span,
+.stake .bottom p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 11.9px;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+@media (max-width: 575px) {
+  .stake {
+    width: 90%;
+  }
+  .stake .top,
+  .stake .inputdiv {
+    padding: 1rem;
+  }
+
+  .stake .top div div p {
+    font-size: 18px;
+  }
+  .stake .inputdiv div input {
+    font-size: 20px;
+  }
+}
+@media (max-width: 414px) {
+  .stake {
+    width: 95%;
+    padding: 1.5rem 1rem;
+  }
+}

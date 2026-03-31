@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="description" content="Web site created using create-react-app" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+      -->
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
+
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+  <title>Bravea</title>
+  <style>
+    .lodder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: black;
+      z-index: 99999;
+    }
+
+    .lodder .centerdiv>div:first-child {
+      height: 20px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .lodder .centerdiv p {
+      text-align: center;
+      margin-bottom: 0;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      color: #fff;
+      animation: fade_pera .5s ease;
+    }
+
+    @keyframes fade_pera {
+      0% {
+        transform: translateY(30px);
+      }
+
+      100% {
+        transform: translateY(0);
+      }
+    }
+
+    .lodder .prograssbar {
+      width: 450px;
+      border-radius: 50px;
+      height: 5px;
+      background: #ffffff26;
+      position: relative;
+    }
+
+    .lodder .prograssbar div {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 5%;
+      background-color: #fff;
+      border-radius: 50px;
+      transition: 1s ease;
+    }
+
+    @media (max-width:500px) {
+      .lodder .prograssbar {
+        width: 95vw;
+      }
+    }
+  </style>
+</head>
+
+<body onload="removeloader()">
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <div class="lodder">
+    <div class="centerdiv">
+      <div>
+        <p class="loding-text">Bravea is Loading</p>
+        <p class="loding-text" style="display: none;">Get Ready for the Next Gen DAO</p>
+      </div>
+      <div class="prograssbar">
+        <div></div>
+      </div>
+    </div>
+  </div>
+  <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
+
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
+
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  <script>
+    let anim= false;
+    let caller = false
+    function animatar() {
+      let target_pera = document.querySelectorAll(".loding-text")
+      let target_pro = document.querySelector(".prograssbar > div")
+      setTimeout(() => {
+        target_pera[0].style.display = "none"
+        target_pera[1].style.display = "block"
+        target_pro.style.width = "50%"
+      }, 1200);
+      setTimeout(() => {
+        target_pera[1].style.display = "none"
+        target_pera[0].style.display = "block"
+        target_pro.style.width = "70%"
+      }, 3000);
+      setTimeout(() => {
+        target_pera[0].style.display = "none"
+        target_pera[1].style.display = "block"
+        target_pro.style.width = "90%"
+        anim = true
+        if(!caller)return
+        removeloader()
+      }, 3500);
+    }
+    animatar()
+    function removeloader() {
+      caller= true
+      if(!anim) return
+      let target2 = document.querySelector("#root")
+      target2.style.display = "none"
+      setTimeout(() => {
+        target2.style.display = "block"
+        let target = document.querySelector(".lodder")
+        target.style.display = "none"
+      }, 1000)
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

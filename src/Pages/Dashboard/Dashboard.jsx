@@ -1,0 +1,758 @@
+import React, { useEffect, useState } from "react";
+import {
+  WETHX_TOKEN_ADDRESS,
+  WETH_TOKEN_ADDRESS,
+  POTION_DAO_STAKING_ADDRESS,
+  PTN_TOKEN_ADDRESS,
+  WETHX_PTN_MASTER_ORACLE_ADDRESS,
+  UNISWAP_ROUTER_ADDRESS,
+} from "../../Config/index";
+
+import POTION_DAO_STAKING_ABI from "../../Config/POTION_DAO_STAKING_ABI.json";
+import WETHX_PTN_MASTER_ORACLE_ABI from "../../Config/WETHX_PTN_MASTER_ORACLE_ABI.json";
+
+import { useAccount, useBalance, useContractRead } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import useCustomContractRead from "../../Hooks/useCustomContractRead";
+import convertWeiToEther from "../../Utils/convertWeiToEther";
+import useCustomContractWrite from "../../Hooks/useCustomContractWrite";
+import convertEtherToWei from "../../Utils/convertEtherToWei";
+// import Loader from "../Loader/Loader";
+
+import { useNavigate } from "react-router-dom";
+
+import style from "./dashboard.module.css";
+import { formatNumber } from "../../common/FormateNum";
+import { Link } from "react-router-dom";
+
+export const Dashboard = () => {
+  const { address, isConnected } = useAccount();
+  const navigate = useNavigate();
+  const WETH_USD_FALLBACK = 700;
+
+  const toNumber = (value) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const toEtherNumber = (value) => toNumber(convertWeiToEther(value));
+
+  const toFixedSafe = (value, decimals = 2) =>
+    toNumber(value).toFixed(decimals);
+
+  const [totalClaimableRewards, setTotalClaimableRewards] = useState("0");
+  const [totalClaimableRewardsBNB, setTotalClaimableRewardsBNB] = useState("0");
+  const [totalEarlyClaimableRewards, setTotalEarlyClaimableRewards] =
+    useState("0");
+  const [earlyPenalty, setearlyPenalty] = useState("0");
+  const [potionPrice, setPotionPrice] = useState(0);
+
+  const { data: potionPriceRate } = useCustomContractRead({
+    Adrress: WETHX_PTN_MASTER_ORACLE_ADDRESS,
+    Abi: WETHX_PTN_MASTER_ORACLE_ABI,
+    FuncName: "getYTokenPrice",
+  });
+
+  useEffect(() => {
+    const derivedPotionPrice =
+      toEtherNumber(potionPriceRate) * WETH_USD_FALLBACK;
+    setPotionPrice(toNumber(derivedPotionPrice));
+  }, [potionPriceRate]);
+
+  useCustomContractRead({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "claimableRewards",
+    Args: [address],
+    isEnabled: address !== undefined,
+    onSuccess: (data) => {
+      const total1 = toEtherNumber(data?.[0]?.amount).toString();
+      const total2 = toEtherNumber(data?.[1]?.amount).toString();
+
+      setTotalClaimableRewards?.(total1);
+      setTotalClaimableRewardsBNB?.(total2);
+    },
+  });
+
+  const { data: _withdrawablebalance } = useCustomContractRead({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "withdrawableBalance",
+    Args: [address],
+    isEnabled: address !== undefined,
+    onSuccess: (data) => {
+      setTotalEarlyClaimableRewards(
+        toEtherNumber(data?.amount?.toString()).toString()
+      );
+      setearlyPenalty(toEtherNumber(data?.penaltyAmount?.toString()).toString());
+    },
+  });
+
+  const {
+    _useContractWrite: getRewardContract,
+    _useWaitForTransaction: getRewardWaitForTransaction,
+  } = useCustomContractWrite({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "getReward",
+    isEnabled:
+      address !== undefined &&
+      (toNumber(totalClaimableRewards) > 0 ||
+        toNumber(totalClaimableRewardsBNB) > 0),
+  });
+
+  const { data: earnedBalances } = useCustomContractRead({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "earnedBalances",
+    Args: [address],
+    isEnabled: address !== undefined,
+    onSuccess: (data) => {
+      // setTotalEarlyClaimableRewards(
+      //   parseFloat?.(totalClaimableRewards) +
+      //     parseFloat?.(convertWeiToEther?.(data?.total?.toString()))
+      // );
+    },
+  });
+
+  const { data: lockedBalances } = useCustomContractRead({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "lockedBalances",
+    Args: [address],
+    isEnabled: address !== undefined,
+    // onSuccess:(data)=>{
+    //   console.log(data?.total?.toString());
+    // }
+  });
+
+  const {
+    _useContractWrite: emergencyWithdrawContract,
+    _useWaitForTransaction: emergencyWithdrawWaitForTransaction,
+  } = useCustomContractWrite({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "emergencyWithdraw",
+    isEnabled:
+      address !== undefined && toNumber(totalEarlyClaimableRewards) > 0,
+  });
+
+  const { data: totalStakedSupply } = useCustomContractRead({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "totalSupply",
+    // onSuccess:(data)=>{
+    //   console.log(data?.toString());
+    // }
+  });
+
+  const { data: totalLockedSupply } = useCustomContractRead({
+    Adrress: POTION_DAO_STAKING_ADDRESS,
+    Abi: POTION_DAO_STAKING_ABI,
+    FuncName: "lockedSupply",
+    // onSuccess:(data)=>{
+    //   console.log(data?.toString());
+    // }
+  });
+
+  const totalStakedAmount = toEtherNumber(totalStakedSupply?.toString());
+  const lockedAmount = toEtherNumber(totalLockedSupply?.toString());
+  const stakedAmount = Math.max(totalStakedAmount - lockedAmount, 0);
+  const stakedUSD = stakedAmount * toNumber(potionPrice);
+  const lockedUSD = lockedAmount * toNumber(potionPrice);
+  const claimableBrva = toNumber(totalClaimableRewards);
+  const claimableWethx = toNumber(totalClaimableRewardsBNB);
+  const earlyClaimableBrva = toNumber(totalEarlyClaimableRewards);
+  const claimAllBrva = claimableBrva + earlyClaimableBrva;
+  const vestedBrva = toEtherNumber(earnedBalances?.total?.toString());
+
+  const isClaimPending =
+    getRewardContract?.isLoading || getRewardWaitForTransaction?.isLoading;
+  const isClaimAllPending =
+    emergencyWithdrawContract?.isLoading ||
+    emergencyWithdrawWaitForTransaction?.isLoading;
+
+  const canClaim =
+    address !== undefined &&
+    (claimableBrva > 0 || claimableWethx > 0) &&
+    Boolean(getRewardContract?.writeAsync) &&
+    !isClaimPending;
+
+  const canClaimAll =
+    address !== undefined &&
+    claimAllBrva > 0 &&
+    Boolean(emergencyWithdrawContract?.writeAsync) &&
+    !isClaimAllPending;
+
+  const [remainingTimes, setRemainingTimes] = useState([]);
+  const [remainingTimesLocks, setRemainingTimesLocks] = useState([]);
+
+  const calculateRemainingTime = (epochTime) => {
+    const targetTime = toNumber(epochTime);
+    const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds (epoch)
+    const timeLeft = targetTime - currentTime; // Calculate remaining time
+
+    if (timeLeft <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+    const days = Math.floor(timeLeft / (60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((timeLeft % (60 * 60)) / 60);
+    const seconds = Math.floor(timeLeft % 60);
+
+    return { days, hours, minutes, seconds };
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedRemainingTimes = earnedBalances?.earningsData?.map(
+        ([amount, epochTime]) => calculateRemainingTime(epochTime)
+      );
+      setRemainingTimes(updatedRemainingTimes || []);
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, [earnedBalances]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedRemainingTimes = lockedBalances?.lockData?.map(
+        ([amount, epochTime]) => calculateRemainingTime(epochTime)
+      );
+      setRemainingTimesLocks(updatedRemainingTimes || []);
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval); // Cleanup the interval on component unmount
+  }, [lockedBalances]);
+
+  return (
+    <main className="self_container my-5 d-lg-flex gap-xl-4 gap-3">
+      <div className={style.left + " col-lg-7"}>
+        <div className="d-flex flex-column flex-sm-row gap-xl-4 gap-3 ">
+          <div className={style.card}>
+            <div className="d-flex align-items-center justify-content-between">
+              <h2>STaked</h2>
+              <p className="text-end">Unlocked BRVA Staked</p>
+            </div>
+            <div className="d-flex flex-wrap gap-2 mt-5 align-items-xl-end justify-content-between">
+              <div className="d-flex gap-2">
+                <img src="/assets/demo.svg" alt="" />
+                <div>
+                  <p className="mb-0">
+                    {toFixedSafe(stakedAmount, 2)}
+                  </p>
+                  <span className="opacity-50">
+                    ${toFixedSafe(stakedUSD, 3)}
+                  </span>
+                </div>
+              </div>
+              <Link to="/stake" className="btn-fill-dark py-3 px-4 text-center">
+                Stake Now
+              </Link>
+            </div>
+          </div>
+          <div className={style.card}>
+            <div className="d-flex align-items-center justify-content-between">
+              <h2>LOCKED</h2>
+              <p className="text-end">Total BRVA Locked</p>
+            </div>
+            <div className="d-flex flex-wrap mt-5 align-items-xl-end gap-2 justify-content-between">
+              <div className="d-flex gap-2">
+                <img src="/assets/demo.svg" alt="" />
+                <div>
+                  <p className="mb-0">
+                    {toFixedSafe(lockedAmount, 2)}{" "}
+                  </p>
+                  <span className="opacity-50">
+                    ${toFixedSafe(lockedUSD, 3)}
+                  </span>
+                </div>
+              </div>
+              <Link to="/lock" className="btn-fill-dark py-3 px-4 text-center">
+                Lock Now
+              </Link>
+            </div>
+          </div>
+        </div>
+        <div className={style.list + " mt-4"}>
+          <h2>Vested</h2>
+          <div className={style.card_parent}>
+            {earnedBalances?.earningsData?.length > 0 ? (
+              earnedBalances.earningsData.map((data, index) => (
+                <div
+                  key={index}
+                  className={
+                    style.card +
+                    " d-flex flex-wrap flex-xl-nowrap justify-content-between align-items-center"
+                  }
+                >
+                  <div className="d-flex gap-2 align-items-center">
+                    <div
+                      className={
+                        style.imgdiv +
+                        " d-flex justify-content-center align-items-center"
+                      }
+                    >
+                      <img src="/icons/logo.svg" alt="" />
+                    </div>
+                    <p className="mb-0">
+                      {toFixedSafe(toEtherNumber(data[0]?.toString()), 2)}{" "}
+                    </p>{" "}
+                    {/* Replace with dynamic data */}
+                  </div>
+                  <div className="d-lg-none d-md-block d-sm-none d-xl-block">
+                    <div className="d-flex justify-content-between mt-2 mt-sm-0 gap-md-5 gap-2 gap-lg-2 gap-xl-5">
+                      <p className="mb-0 opacity-50">Claimable in</p>
+                      <div className="d-flex gap-1">
+                        <p className="mb-0">
+                          {remainingTimes[index]?.days || 0}D
+                        </p>
+                        <p className="mb-0">
+                          {remainingTimes[index]?.hours || 0}H
+                        </p>
+                        <p className="mb-0">
+                          {remainingTimes[index]?.minutes || 0}M
+                        </p>
+                        <p className="mb-0">
+                          {remainingTimes[index]?.seconds || 0}S
+                        </p>
+                      </div>
+                    </div>
+                    {/* <input
+                        id="input_curve"
+                        type="range"
+                        value={data.claimPercentage}
+                        style={{
+                          background: `linear-gradient(to right, var(--main-color) ${
+                            data.claimPercentage
+                          }%, #E3DEDE ${100 - data.claimPercentage}%`,
+                        }}
+                        className="curve-slider"
+                      /> */}
+                  </div>
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="tooltip-parent align-items-center d-flex gap-2 position-relative">
+                      <img src="/icons/info.svg" alt="" />
+                      <p
+                        className="mb-0 opacity-50"
+                        style={{ fontWeight: "300" }}
+                      >
+                        info
+                      </p>
+                      <p
+                        className="info-tooltip left position-absolute"
+                        style={{
+                          bottom: 0,
+                          left: 0,
+                          transform: "translate(-120%, 50%)",
+                        }}
+                      >
+                        tooltip
+                      </p>
+                    </div>
+                  </div>
+                  <div className="w-100 d-md-none d-none d-sm-block d-lg-block d-xl-none">
+                    <div className="d-flex justify-content-between mt-2 gap-md-5 gap-2 gap-lg-2 gap-xl-5 ">
+                      <p className="mb-0 opacity-50">Claimable in</p>
+                      <div className="d-flex gap-1">
+                        <p className="mb-0">
+                          {remainingTimes[index]?.days || 0}D
+                        </p>
+                        <p className="mb-0">
+                          {remainingTimes[index]?.hours || 0}H
+                        </p>
+                        <p className="mb-0">
+                          {remainingTimes[index]?.minutes || 0}M
+                        </p>
+                        <p className="mb-0">
+                          {remainingTimes[index]?.seconds || 0}S
+                        </p>
+                      </div>
+                    </div>
+                    {/* <input
+          id="input_curve"
+          type="range"
+          value={data.claimPercentage}
+          style={{
+            background:
+              `linear-gradient(to right, var(--main-color) ${data.claimPercentage}%, #E3DEDE ${(100 - data.claimPercentage)}%`,
+          }}
+          className="curve-slider"
+        /> */}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="d-flex justify-content-center align-items-center h-100">
+                <p className="opacity-50 fs-5" style={{ fontWeight: "300" }}>
+                  No Vestings Found
+                </p>
+              </div>
+            )}
+
+            {/* <div className={style.listcard + ' d-flex flex-wrap justify-content-between gap-sm-2'}>
+                            <div className='d-flex gap-2 align-items-center'>
+                                <img src="/assets/demo.svg" alt="" />
+                                <p className='mb-0'>1781713.44</p>
+                            </div>
+                            <div className='d-sm-none d-md-block d-lg-none d-xl-block'>
+                                <div className='d-flex align-items-center gap-3 justify-content-between'>
+                                    <p className='mb-0 opacity-50' style={{ fontSize: "12px" }}>Claimable in</p>
+                                    <p className='mb-0 ' style={{ fontSize: "14px", fontWeight:"500"}}>14D 24H 28M 14S</p>
+                                </div>
+                                <input
+                                    id="input_curve"
+                                    type="range"
+                                    value="50"
+                                    style={{
+                                        background:
+                                            `linear-gradient(to right, var(--dark) 70%, #E7E7E7 30%`,
+                                    }}
+                                    className="curve-slider"
+                                />
+                            </div>
+                            <div className='d-flex align-items-center justify-content-between gap-2'>
+                                <button className='btn-fill-dark py-3 px-4'>Claim Now</button>
+                                <div className='tooltip-parent border-0 position-relative d-flex gap-1 align-items-center p-0'>
+                                    <img src="/assets/info.svg" alt="" width="15px" />
+                                    <p className='mb-0 opacity-50' style={{ fontSize: "12px", lineHeight: "12px", fontWeight:"500" }}>info</p>
+                                    <p className='position-absolute info-tooltip left m-0'
+                                        style={{
+                                            bottom: "50%",
+                                            left: 0,
+                                            transform: "translate(-115%, 50%)",
+                                        }}
+                                    >tooltip</p>
+                                </div>
+                            </div>
+                            <div className='w-100 mt-2 d-md-none d-lg-block d-xl-none d-none d-sm-block'>
+                                <div className='d-flex align-items-center gap-3 justify-content-between'>
+                                    <p className='mb-0 opacity-50' style={{ fontSize: "12px" }}>Claimable in</p>
+                                    <p className='mb-0 ' style={{ fontSize: "14px", fontWeight:"500" }}>14D 24H 28M 14S</p>
+                                </div>
+                                <input
+                                    id="input_curve"
+                                    type="range"
+                                    value="50"
+                                    style={{
+                                        background:
+                                            `linear-gradient(to right, var(--dark) 70%, #E7E7E7 30%`,
+                                    }}
+                                    className="curve-slider"
+                                />
+                            </div>
+                        </div> */}
+          </div>
+          {/* <div className='d-flex justify-content-center align-items-center mt-4'>
+                        <p>No Vesting found</p>
+                    </div> */}
+        </div>
+        <div className={style.list + " mt-4"}>
+          <h2>Locked</h2>
+          <div className={style.card_parent}>
+          {lockedBalances?.lockData?.length > 0 ? (
+                lockedBalances.lockData.map((data, index) => (
+                  <div
+                    key={index}
+                    className={
+                      style.card +
+                      " d-flex flex-wrap flex-xl-nowrap justify-content-between align-items-center"
+                    }
+                  >
+                    <div className="d-flex gap-2 align-items-center">
+                      <div
+                        className={
+                          style.imgdiv +
+                          " d-flex justify-content-center align-items-center"
+                        }
+                      >
+                        <img src="/icons/logo.svg" alt="" />
+                      </div>
+                      <p className="mb-0">
+                        {toFixedSafe(toEtherNumber(data[0]?.toString()), 2)}{" "}
+                      </p>{" "}
+                      {/* Replace with dynamic data */}
+                    </div>
+                    <div className="d-lg-none d-md-block d-sm-none d-xl-block">
+                      <div className="d-flex justify-content-between mt-2 mt-sm-0 gap-md-5 gap-2 gap-lg-2 gap-xl-5">
+                        <p className="mb-0 opacity-50">Unlocks in</p>
+                        <div className="d-flex gap-1">
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.days || 0}D
+                          </p>
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.hours || 0}H
+                          </p>
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.minutes || 0}M
+                          </p>
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.seconds || 0}S
+                          </p>
+                        </div>
+                      </div>
+                      {/* <input
+                        id="input_curve"
+                        type="range"
+                        value={data.claimPercentage}
+                        style={{
+                          background: `linear-gradient(to right, var(--main-color) ${
+                            data.claimPercentage
+                          }%, #E3DEDE ${100 - data.claimPercentage}%`,
+                        }}
+                        className="curve-slider"
+                      /> */}
+                    </div>
+                    <div className="d-flex align-items-center gap-3">
+                     
+                      <div className="tooltip-parent align-items-center d-flex gap-2 position-relative">
+                        <img src="/icons/info.svg" alt="" />
+                        <p
+                          className="mb-0 opacity-50"
+                          style={{ fontWeight: "300" }}
+                        >
+                          info
+                        </p>
+                        <p
+                          className="info-tooltip left position-absolute"
+                          style={{
+                            bottom: 0,
+                            left: 0,
+                            transform: "translate(-120%, 50%)",
+                          }}
+                        >
+                          tooltip
+                        </p>
+                      </div>
+                    </div>
+                    <div className="w-100 d-md-none d-none d-sm-block d-lg-block d-xl-none">
+                      <div className="d-flex justify-content-between mt-2 gap-md-5 gap-2 gap-lg-2 gap-xl-5 ">
+                        <p className="mb-0 opacity-50">Claimable in</p>
+                        <div className="d-flex gap-1">
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.days || 0}D
+                          </p>
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.hours || 0}H
+                          </p>
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.minutes || 0}M
+                          </p>
+                          <p className="mb-0">
+                            {remainingTimesLocks[index]?.seconds || 0}S
+                          </p>
+                        </div>
+                      </div>
+                      {/* <input
+          id="input_curve"
+          type="range"
+          value={data.claimPercentage}
+          style={{
+            background:
+              `linear-gradient(to right, var(--main-color) ${data.claimPercentage}%, #E3DEDE ${(100 - data.claimPercentage)}%`,
+          }}
+          className="curve-slider"
+        /> */}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="d-flex justify-content-center align-items-center h-100">
+                  <p className="opacity-50 fs-5" style={{fontWeight:"300"}}>No Locks Found</p>
+                </div>
+              )}
+
+
+
+            {/* <div
+              className={
+                style.listcard +
+                " d-flex flex-wrap justify-content-between gap-sm-2"
+              }
+            >
+              <div className="d-flex gap-2 align-items-center">
+                <img src="/assets/demo.svg" alt="" />
+                <p className="mb-0">1781713.44</p>
+              </div>
+              <div className="d-sm-none d-md-block d-lg-none d-xl-block">
+                <div className="d-flex align-items-center gap-3 justify-content-between">
+                  <p className="mb-0 opacity-50" style={{ fontSize: "12px" }}>
+                    Claimable in
+                  </p>
+                  <p
+                    className="mb-0 "
+                    style={{ fontSize: "14px", fontWeight: 500 }}
+                  >
+                    14D 24H 28M 14S
+                  </p>
+                </div>
+                <input
+                  id="input_curve"
+                  type="range"
+                  value="50"
+                  style={{
+                    background: `linear-gradient(to right, var(--dark) 70%, #E7E7E7 30%`,
+                  }}
+                  className="curve-slider"
+                />
+              </div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <button className="btn-fill-dark py-3 px-4">Claim Now</button>
+                <div className="tooltip-parent border-0 position-relative d-flex gap-1 align-items-center p-0">
+                  <img src="/assets/info.svg" alt="" width="15px" />
+                  <p
+                    className="mb-0 opacity-50"
+                    style={{
+                      fontSize: "12px",
+                      lineHeight: "12px",
+                      fontWeight: 500,
+                    }}
+                  >
+                    info
+                  </p>
+                  <p
+                    className="position-absolute info-tooltip left m-0"
+                    style={{
+                      bottom: "50%",
+                      left: 0,
+                      transform: "translate(-115%, 50%)",
+                    }}
+                  >
+                    tooltip
+                  </p>
+                </div>
+              </div>
+              <div className="w-100 mt-2 d-md-none d-lg-block d-xl-none d-none d-sm-block">
+                <div className="d-flex align-items-center gap-3 justify-content-between">
+                  <p className="mb-0 opacity-50" style={{ fontSize: "12px" }}>
+                    Claimable in
+                  </p>
+                  <p
+                    className="mb-0 "
+                    style={{ fontSize: "14px", fontWeight: 500 }}
+                  >
+                    14D 24H 28M 14S
+                  </p>
+                </div>
+                <input
+                  id="input_curve"
+                  type="range"
+                  value="50"
+                  style={{
+                    background: `linear-gradient(to right, var(--dark) 70%, #E7E7E7 30%`,
+                  }}
+                  className="curve-slider"
+                />
+              </div>
+            </div> */}
+           
+          </div>
+          {/* <div className='d-flex justify-content-center align-items-center mt-4'>
+                        <p>No Vesting found</p>
+                    </div> */}
+        </div>
+      </div>
+      <div className={style.right + " flex-grow-1 mt-4 mt-lg-0"}>
+        <h2>Rewards</h2>
+        <div className={style.card + " mt-4"}>
+          <div className="d-flex flex-column flex-sm-row align-items-sm-top align-items-center gap-sm-2 justify-content-between ">
+            <h3>Claimable BRVA</h3>
+            <p className="text-sm-end text-center">
+              Includes BRVA Vested and Locked
+            </p>
+          </div>
+          <div className="d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+            <div className="d-flex gap-2">
+              <img src="/assets/demo.svg" alt="" />
+              <div className="d-flex align-items-end gap-1">
+                <p className="mb-0">                    {formatNumber(toFixedSafe(claimableBrva, 2))}
+                </p>
+                {/* <span>$24.78</span> */}
+              </div>
+              
+            </div>
+            <div className="d-flex gap-2">
+              <img src="/assets/demo1.svg" alt="" />
+              <div className="d-flex align-items-end gap-1">
+                <p className="mb-0">                   {formatNumber(toFixedSafe(claimableWethx, 2))}
+                </p>
+                {/* <span>$24.78</span> */}
+              </div>
+              
+            </div>
+            <button
+              onClick={async () => {
+                //  console.log("h");
+                try {
+                  if (getRewardContract?.writeAsync) {
+                    await getRewardContract.writeAsync();
+                  }
+                } catch (error) {
+                  console.log(error);
+                }
+              }} 
+            disabled={!canClaim} className="btn-fill-dark py-3 px-4">Claim {isClaimPending &&
+                    ". . ."} </button>
+          </div>
+        </div>
+        <div className={style.card + " mt-2"}>
+          <div className="d-flex flex-column flex-sm-row align-items-sm-top align-items-center gap-sm-2 justify-content-between ">
+            <h3>BRVA in Vesting</h3>
+            <p className="text-sm-end text-center">
+              BRVA can be claimed with 50% Penalty
+            </p>
+          </div>
+          <div className="d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+            <div className="d-flex gap-2">
+              <img src="/assets/demo.svg" alt="" />
+              <div className="d-flex align-items-end gap-1">
+                <p className="mb-0"> {formatNumber(toFixedSafe(vestedBrva, 2))}</p>
+                {/* <span>$24.78</span> */}
+              </div>
+            </div>
+            {/* <button className="btn-fill-dark py-3 px-4">Claim</button> */}
+          </div>
+        </div>
+        <div className={style.card + " mt-2"}>
+          <div className="d-flex flex-column flex-sm-row align-items-sm-top align-items-center gap-sm-2 justify-content-between ">
+            <h3>Claim All</h3>
+            <p className="text-sm-end text-center">
+              With Penalty if Applicable
+            </p>
+          </div>
+          <div className="d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
+            <div className="d-flex gap-2">
+              <img src="/assets/demo.svg" alt="" />
+              <div className="d-flex align-items-end gap-1">
+                <p className="mb-0"> {formatNumber(toFixedSafe(claimAllBrva, 0))}</p>
+                {/* <span>$24.78</span> */}
+              </div>
+              
+            </div>
+            <div className="d-flex gap-2">
+              <img src="/assets/demo1.svg" alt="" />
+              <div className="d-flex align-items-end gap-1">
+                <p className="mb-0">                     {" "}
+                {formatNumber(toFixedSafe(claimableWethx, 2))}</p>
+                {/* <span>$24.78</span> */}
+              </div>
+              
+            </div>
+            <button className="btn-fill-dark py-3 px-4" disabled={!canClaimAll}
+                onClick={async () => {
+                    // console.log("h");
+                    try {
+                      if (emergencyWithdrawContract?.writeAsync) {
+                        await emergencyWithdrawContract.writeAsync();
+                      }
+                    } catch (error) {
+                      console.log(error);
+                    }
+                  }}
+                >Claim {isClaimAllPending &&
+                    ". . ."}</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
