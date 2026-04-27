@@ -2,8 +2,6 @@
 import useCustomContractWrite from "../Hooks/useCustomContractWrite";
 import Loader from "../Component/Common/Loader";
 import { erc20ABI, useAccount, useToken } from "wagmi";
-import useCustomContractRead from "../Hooks/useCustomContractRead";
-import convertWeiToEther from "../Utils/convertWeiToEther";
 import { useEffect } from "react";
 import convertEtherToWei from "../Utils/convertEtherToWei";
 import IUniswapv2Pair from "../Config/IUniswapv2Pair.json";
@@ -53,8 +51,8 @@ const ApproveButton = ({
     }
   }, [
     approveWaitForTransaction?.isSuccess,
-    approveWaitForTransaction?.isSuccess,
-    address,
+    approveContractWrite?.isSuccess,
+    setIsApprovedERC20,
   ]);
 
   return (

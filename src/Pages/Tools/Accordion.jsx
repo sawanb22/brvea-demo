@@ -20,7 +20,6 @@ import useCustomContractWrite from "../../Hooks/useCustomContractWrite";
 import convertEtherToWei from "../../Utils/convertEtherToWei";
 import Loader from "../../Component/Common/Loader"
 import convertWeiToEther from "../../Utils/convertWeiToEther";
-import PropTypes from "prop-types";
 // import zapBtn from "../../src/Components/Image/zapBtn.svg";
 // import { styled } from "@mui/material/styles";
 // import Dialog from "@mui/material/Dialog";
@@ -36,7 +35,6 @@ import { formatNumber } from "../../common/FormateNum";
 
 
 import style from "./tool.module.css"
-import { ZapModal } from './ZapModal'
 
 
 export const Accordion = (props) => {
@@ -330,7 +328,7 @@ export const Accordion = (props) => {
   
     const [lpPrice, setLpPrice] = useState(0);
   
-    const { data: _lpRate2 } = useCustomContractRead({
+    useCustomContractRead({
       Adrress: lpToken,
       Abi: TOKEN_ABI,
       FuncName: "totalSupply",
@@ -401,7 +399,6 @@ export const Accordion = (props) => {
     const accordArr = ["One", "Two", "Three", "Four", "Five"];
   
     function convertSeconds(seconds) {
-      const days = Math.floor(seconds / (24 * 3600)); // 24 hours * 3600 seconds in an hour
       seconds %= 24 * 3600;
       const hours = Math.floor(seconds / 3600); // 3600 seconds in an hour
       seconds %= 3600;
@@ -455,11 +452,11 @@ export const Accordion = (props) => {
                             type="button"
                             data-bs-toggle="collapse"
                             data-bs-target={`#collapse${accordArr[props.index]}`}
-                            aria-expanded={`${props.index == 0 ? "true" : ""}`}
+                            aria-expanded={props.index === 0}
                             aria-controls={`collapse${accordArr[props.index]}`}
                         >
                             <div className="d-flex gap-sm-2 gap-1 align-items-center flex-grow-1">
-                                <img src={`/assets/${accordArr[props.index]==0?"demo":"demo1"}.svg`} alt="img" />
+                                <img src={`/assets/${props.index === 0 ? "demo" : "demo1"}.svg`} alt="img" />
                                 <img src="/assets/demo1.svg" alt="img" />
                                 {/* <div className={style.imgdiv + " d-flex gap-sm-2"}>
                             <div className="d-flex justify-content-center align-items-center">
@@ -541,7 +538,7 @@ export const Accordion = (props) => {
                         </div>
                         <div
                             id={`collapse${accordArr[props.index]}`}
-                            className={`accordion-collapse collapse ${props.index == 0 ? "show" : ""}`}
+                            className={`accordion-collapse collapse ${props.index === 0 ? "show" : ""}`}
                             data-bs-parent="#accordionExample"
                         >
                             {/* state code for tab and mini devices */}
@@ -682,7 +679,7 @@ export const Accordion = (props) => {
                       />
                     </div>
                   ) : parseFloat?.(
-                      inputDepositValue == "" ? "0" : inputDepositValue
+                      inputDepositValue === "" ? "0" : inputDepositValue
                     ).toFixed(18) > parseFloat?.(lpBalance?.formatted) ? (
                     <button className='btn-fill-dark py-3 w-100'>
                       Insufficient Fund
@@ -943,6 +940,7 @@ export const Accordion = (props) => {
                                         <a
                                         href={`https://pancakeswap.finance/v2/add/${token1Info?.address}/${token0Info?.address}`}
                                             target="_blank"
+                                            rel="noreferrer"
                                             style={{
                                                 color: "var(--dark)",
                                                 fontWeight: "500",
@@ -954,6 +952,7 @@ export const Accordion = (props) => {
                                         <a
                                            href={`https://pancakeswap.finance/v2/remove/${token1Info?.address}/${token0Info?.address}`}
                                             target="_blank"
+                                            rel="noreferrer"
                                             style={{
                                                 color: "var(--dark)",
                                                 fontWeight: "500",
