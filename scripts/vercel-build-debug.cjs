@@ -56,10 +56,22 @@ sendLog("H2", "scripts/vercel-build-debug.cjs:51", "resolver snapshot", {
 });
 // #endregion
 
+const childEnv = {
+  ...process.env,
+  CI: "false",
+};
+
+// #region agent log
+sendLog("H5", "scripts/vercel-build-debug.cjs:64", "build env override", {
+  ciBefore: process.env.CI || null,
+  ciChild: childEnv.CI,
+});
+// #endregion
+
 const child = spawn("npx", ["react-scripts", "build"], {
   stdio: "inherit",
   shell: true,
-  env: process.env,
+  env: childEnv,
 });
 
 child.on("exit", async (code, signal) => {
